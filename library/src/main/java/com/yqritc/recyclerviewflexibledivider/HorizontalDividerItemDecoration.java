@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DimenRes;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,8 +21,8 @@ public class HorizontalDividerItemDecoration extends FlexibleDividerDecoration {
         mMarginProvider = builder.mMarginProvider;
     }
 
-    @Override
-    protected Rect getDividerBound(int position, RecyclerView parent, View child) {
+    @NonNull
+    private Rect calculateBounds(int position, RecyclerView parent, View child, boolean isReverseLayout) {
         Rect bounds = new Rect(0, 0, 0, 0);
         int transitionX = (int) ViewCompat.getTranslationX(child);
         int transitionY = (int) ViewCompat.getTranslationY(child);
@@ -32,7 +33,6 @@ public class HorizontalDividerItemDecoration extends FlexibleDividerDecoration {
                 mMarginProvider.dividerRightMargin(position, parent) + transitionX;
 
         int dividerSize = getDividerSize(position, parent);
-        boolean isReverseLayout = isReverseLayout(parent);
         if (mDividerType == DividerType.DRAWABLE) {
             // set top and bottom position of divider
             if (isReverseLayout) {
@@ -62,8 +62,17 @@ public class HorizontalDividerItemDecoration extends FlexibleDividerDecoration {
                 bounds.bottom -= dividerSize;
             }
         }
-
         return bounds;
+    }
+
+    @Override
+    protected Rect getDividerBound(int position, RecyclerView parent, View child) {
+        return calculateBounds(position, parent, child, isReverseLayout(parent));
+    }
+
+    @Override
+    protected Rect getFirstDividerBound(int position, RecyclerView parent, View child) {
+        return checkFirstShow(parent, position) ? calculateBounds(position, parent, child, true) : new Rect();
     }
 
     @Override
@@ -73,10 +82,12 @@ public class HorizontalDividerItemDecoration extends FlexibleDividerDecoration {
             return;
         }
 
+        int dividerSize = getDividerSize(position, parent);
+
         if (isReverseLayout(parent)) {
-            outRect.set(0, getDividerSize(position, parent), 0, 0);
+            outRect.set(0, dividerSize, 0, 0);
         } else {
-            outRect.set(0, 0, 0, getDividerSize(position, parent));
+            outRect.set(0, checkFirstShow(parent, position) ? dividerSize : 0, 0, dividerSize);
         }
     }
 

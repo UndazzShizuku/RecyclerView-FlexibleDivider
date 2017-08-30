@@ -32,7 +32,9 @@ public class SimpleActivity extends AppCompatActivity {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.main_recyclerview);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
-        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
+        HorizontalDividerItemDecoration itemDecoration = new HorizontalDividerItemDecoration.Builder(this)
+                .showFirstDivider().showLastDivider().build();
+        recyclerView.addItemDecoration(itemDecoration);
     }
 
 
